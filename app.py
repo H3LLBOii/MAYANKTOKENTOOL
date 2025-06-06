@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request
 import requests
 import re
@@ -6,6 +5,7 @@ import re
 app = Flask(__name__)
 
 def extract_token(cookie_str):
+    # Parse cookie string into a dict
     cookies = {}
     for c in cookie_str.split(';'):
         try:
@@ -14,15 +14,22 @@ def extract_token(cookie_str):
         except:
             pass
 
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+
     try:
-        res = requests.get("https://www.facebook.com/adsmanager", cookies=cookies)
+        # Send request to Facebook Business page
+        res = requests.get("https://business.facebook.com/business_locations", cookies=cookies, headers=headers)
+
+        # Try to extract access token (starts with EAA)
         token_match = re.search(r'EAA\w+', res.text)
         if token_match:
             return token_match.group(0)
         else:
-            return "Token not found. Make sure your cookie is valid and fresh."
+            return "❌ Token not found. Make sure your cookie is fresh and valid."
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"⚠️ Error: {str(e)}"
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
