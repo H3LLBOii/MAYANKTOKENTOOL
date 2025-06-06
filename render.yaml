@@ -1,0 +1,9 @@
+
+services:
+  - type: web
+    name: fb-token-tool
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    plan: free
+    region: oregon
